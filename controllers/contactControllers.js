@@ -7,13 +7,16 @@ const {
 const HttpError = require("../helpers/HttpError");
 
 const getAllContactsController = async (req, res) => {
-  const result = await getContacts();
+  const { _id: owner } = req.user;
+
+  const result = await getContacts(owner);
 
   res.json(result);
 };
 
 const addContactController = async (req, res) => {
-  const result = await addContact(req.body);
+  const { _id: owner } = req.user;
+  const result = await addContact({ ...req.body, owner });
 
   res.status(201).json(result);
 };

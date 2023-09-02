@@ -10,6 +10,10 @@ const contactSchema = new Schema(
       type: String,
       required: [true, "number is required"],
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
   { versionKey: false }
 );

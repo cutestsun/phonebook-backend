@@ -9,16 +9,24 @@ const validateBody = require("../middlewares/validateBody");
 const { fullContactSchema } = require("../schemas/contactSchema");
 const checkId = require("../middlewares/checkId");
 
+const authentificate = require("../middlewares/authentificate");
+
 const router = express.Router();
 
-router.get("/", getAllContactsController);
+router.get("/", authentificate, getAllContactsController);
 
-router.post("/", validateBody(fullContactSchema), addContactController);
+router.post(
+  "/",
+  authentificate,
+  validateBody(fullContactSchema),
+  addContactController
+);
 
-router.delete("/:contactId", checkId, deleteContactController);
+router.delete("/:contactId", authentificate, checkId, deleteContactController);
 
 router.put(
   "/:contactId",
+  authentificate,
   checkId,
   validateBody(fullContactSchema),
   updateContactController
