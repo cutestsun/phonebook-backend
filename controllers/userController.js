@@ -1,8 +1,11 @@
 require("dotenv").config();
 const gravatar = require("gravatar");
 const jwt = require("jsonwebtoken");
+const fs = require("fs/promises");
+const path = require("path");
 
 const User = require("../db/models/userModel");
+const HttpError = require("../helpers/HttpError");
 
 const { SECRET_KEY } = process.env;
 
@@ -85,9 +88,36 @@ const currentUserController = async (req, res) => {
   });
 };
 
+const updateAvatarController = async (req, res) => {
+  if (!req.file) {
+    throw HttpError(400, "Missing image");
+  }
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+
+  const filename = `${_id}_${originalname}`;
+  const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+  const resultUpload = path.join(avatarsDir, filename);
+
+  const avatar = path.join("avatars", filename);
+
+  await fs.rename(tempUpload, resultUpload);
+
+  const user = await User.findByIdAndUpdate(_id, { avatar });
+
+  if (!user) {
+    throw HttpError(404, "Not Found");
+  }
+
+  res.json({
+    avatar,
+  });
+};
+
 module.exports = {
   signUpController,
   loginController,
   logoutController,
   currentUserController,
+  updateAvatarController,
 };
